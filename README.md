@@ -1,69 +1,68 @@
-# Data Marketplace Contract
+# Anonymization Smart Contract
 
 ## Overview
-The **Data Marketplace Contract** is a decentralized smart contract that enables companies to request data and allows bidders to submit offers. The contract facilitates transparent transactions, automated pricing, and fair selection of data providers based on predefined criteria.
+The **Anonymization Smart Contract** is designed to facilitate secure and private data submission for research purposes. It utilizes **ring signatures** to anonymize data submissions while ensuring aggregation and verification of the collected information.
 
 ## Features
-- **Data Requests**: Companies can create data requests specifying budget, purpose, and timeframe.
-- **Bidding System**: Data providers can place bids on active data requests.
-- **Bid Acceptance**: Companies can accept bids, finalizing the transaction.
-- **Automated Pricing Suggestion**: The contract provides a suggested price based on budget and quality score.
-- **Secure Access**: Only the request creator can accept bids.
+- **Ring Signature-Based Anonymization:** Ensures privacy by allowing users to submit data without revealing their identity.
+- **Data Aggregation:** Collects and processes submitted data for research analysis.
+- **Role-Based Access Control:** Limits submission and research access to authorized users.
+- **Secure Researcher Management:** Only the contract owner can add or remove authorized researchers.
+- **Tamper-Resistant Data Storage:** Stores aggregated data securely on-chain.
 
-## Contract Components
+## Error Codes
+| Code | Description |
+|------|-------------|
+| `ERR-NOT-AUTHORIZED (u100)` | User is not authorized to perform the action. |
+| `ERR-INVALID-DATA (u101)` | Submitted data is invalid. |
+| `ERR-RING-SIZE-INVALID (u102)` | Provided ring size is invalid. |
 
-### Constants
-- `contract-owner`: The contract deployer.
-- `err-owner-only`: Error returned when a non-owner attempts a restricted action.
-- `err-not-found`: Error returned when a requested entity does not exist.
-- `err-already-exists`: Error for duplicate entries.
-- `err-invalid-bid`: Error for invalid bid submissions.
+## Data Structures
+### Mappings
+- **`aggregated-data`**: Stores aggregated statistics for each category.
+- **`ring-signatures`**: Stores ring signatures for verification.
+- **`authorized-researchers`**: Tracks authorized researchers.
 
-### Data Structures
-- `data-requests` (Map): Stores requests made by companies.
-- `bids` (Map): Stores bids submitted for specific data requests.
-- `request-id-nonce` (Variable): Keeps track of unique request IDs.
+### Variables
+- **`submission-counter`**: Tracks the number of submissions.
+- **`contract-owner`**: Stores the contract owner.
 
+## Functions
 ### Public Functions
-#### 1. `create-data-request (budget uint, purpose string, timeframe uint) → (ok uint)`
-Allows a company to create a new data request with the following parameters:
-- `budget`: Maximum budget allocated for the data.
-- `purpose`: Description of why the data is needed.
-- `timeframe`: The time period for data delivery.
+#### `initialize-contract(researcher: principal) -> (ok true | err)`
+Initializes the contract and authorizes a researcher (only callable by the contract owner).
 
-Returns the unique request ID.
+#### `submit-anonymous-data(category: string, value: uint, ring-size: uint, ring-signature: buff) -> (ok submission-id | err)`
+Submits anonymized data under a specified category using a ring signature.
 
-#### 2. `place-bid (request-id uint, amount uint, quality-score uint) → (ok true)`
-Allows data providers to place bids on active data requests.
-- `request-id`: ID of the data request.
-- `amount`: Bid amount (should be within the request budget).
-- `quality-score`: Quality rating (0-100) of the bid submission.
+#### `add-researcher(researcher: principal) -> (ok true | err)`
+Adds a new researcher to the authorized list (only callable by the contract owner).
 
-#### 3. `accept-bid (request-id uint, bidder principal) → (ok true)`
-Allows the requesting company to accept a bid.
-- Only the request creator can perform this action.
-- The request status is updated to "accepted."
+#### `remove-researcher(researcher: principal) -> (ok true | err)`
+Removes a researcher from the authorized list (only callable by the contract owner).
 
-#### 4. `get-data-request (request-id uint) → (option map)`
-Returns the details of a specific data request.
+### Read-Only Functions
+#### `get-aggregated-data(category: string) -> (ok data | none)`
+Retrieves aggregated data for a given category.
 
-#### 5. `get-bid (request-id uint, bidder principal) → (option map)`
-Returns the details of a bid for a given request and bidder.
+### Private Functions
+#### `generate-ring-members(size: uint) -> list`
+Generates a list of ring members for anonymity.
 
-#### 6. `calculate-suggested-price (request-id uint, quality-score uint) → (ok uint)`
-Calculates a suggested price for a bid based on:
-- 10% of the request's budget as a base price.
-- A multiplier derived from the quality score (0-1.0).
+#### `is-authorized(user: principal) -> bool`
+Checks if a user is authorized to submit data.
+
+## Usage
+1. **Initialize the contract** by adding an initial authorized researcher.
+2. **Submit anonymized data** under different research categories.
+3. **Retrieve aggregated data** for research analysis.
+4. **Manage researchers** to control data submission access.
 
 ## Security Considerations
-- **Authorization Checks**: Only the data request creator can accept bids.
-- **Error Handling**: Proper assertions ensure valid data operations.
-- **Bid Constraints**: Bids exceeding the budget are rejected.
+- Only authorized researchers can submit and retrieve data.
+- Ring signatures help maintain anonymity while ensuring verifiable submissions.
+- Contract owner has exclusive control over researcher management.
 
-## Future Enhancements
-- Implement automated payments upon bid acceptance.
-- Add a dispute resolution mechanism.
-- Introduce reputation tracking for data providers.
+## License
+This project is open-source and available for modification under an appropriate open-source license.
 
-## Conclusion
-The **Data Marketplace Contract** enables a secure and transparent marketplace for data transactions, ensuring fair pricing and quality assessment for both data requesters and providers.
