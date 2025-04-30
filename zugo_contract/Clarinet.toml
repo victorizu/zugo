@@ -5,6 +5,11 @@ authors = []
 telemetry = true
 cache_dir = '.\.cache'
 requirements = []
+[contracts.anonymization]
+path = 'contracts/anonymization.clar'
+clarity_version = 2
+epoch = 2.5
+
 [contracts.data_marketplace]
 path = 'contracts/data_marketplace.clar'
 clarity_version = 2
