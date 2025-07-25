@@ -30,6 +30,11 @@ path = 'contracts/ffd.clar'
 clarity_version = 2
 epoch = 2.5
 
+[contracts.file_sharing]
+path = 'contracts/file_sharing.clar'
+clarity_version = 2
+epoch = 2.5
+
 [contracts.impact]
 path = 'contracts/impact.clar'
 clarity_version = 2
