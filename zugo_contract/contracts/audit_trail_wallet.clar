@@ -197,3 +197,18 @@
     )
 )
 
+;; Get total contract statistics
+(define-read-only (get-contract-stats)
+    {
+        total-transactions: (- (var-get next-transaction-id) u1),
+        contract-balance: (stx-get-balance (as-contract tx-sender))
+    }
+)
+
+;; Admin function to get any user's balance (owner only)
+(define-read-only (admin-get-balance (user principal))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+        (ok (get-balance-internal user))
+    )
+)
